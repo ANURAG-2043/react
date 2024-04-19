@@ -3,12 +3,15 @@ import TotalScore from './TotalScore';
 import NumberSelector from './NumberSelector';
 import RollDice from './RollDice';
 import styled from 'styled-components';
+import { OutlineButton, Button } from '../styled/Button';
+import Rules from './Rules';
 
 const GamePlay = () => {
   const [score, setScore] = useState(0);
   const [selectedNumber, setSelectedNumber] = useState();
   const [currentDice, setCurrentDice] =useState(3);
-
+  const [error, setError] = useState();
+  const [showRules, setShowRules] = useState(false);
 
 const generateRandomNumber = (min, max) =>{
   //console.log(Math.floor(Math.random()*(max-min)+min));
@@ -16,22 +19,39 @@ const generateRandomNumber = (min, max) =>{
 }
 
 const rollDice = () =>{
+
+  //guard clause
+  if(!selectedNumber) {
+    setError("You have not selected any value");
+    return
+  };
+
   const randomNumber = generateRandomNumber(1,7);
   setCurrentDice((prev) => randomNumber);
-}
 
-//if(selectedNumber == randomNumber){
-//   setScore ((prev) => prev + randomNumber);
-// }else {
-//   setScore ((prev)=> prev -2);
-//}
+  if (selectedNumber == randomNumber){
+    setScore((prev) => prev + randomNumber)
+  }else{
+  setScore((prev) => prev -2);
+  }
+  setSelectedNumber(undefined);
+};
 
+  const reset = () =>{
+    setScore(0);
+  }
+
+  const show_Rules = () =>{
+    setShowRules((prev)=> !prev);
+  }
 
   return (
     <MainContainer>
         <div className="top_section">
             <TotalScore score={score} />
             <NumberSelector 
+            error = {error}
+            setError = {setError}
             selectedNumber={selectedNumber} 
             setSelectedNumber={setSelectedNumber} 
             />
@@ -40,6 +60,12 @@ const rollDice = () =>{
         rollDice={rollDice}
         currentDice={currentDice}
         />
+        <div className='btns'>
+          <OutlineButton onClick={reset}>Reset</OutlineButton>
+          <Button onClick={show_Rules}>{showRules? "Hide": "Show"} Show Rules</Button>
+        </div>
+
+        {showRules && <Rules />}
     </MainContainer>
   )
 }
@@ -52,5 +78,15 @@ const MainContainer = styled.main `
         display: flex;
         justify-content: space-around;
         align-items: end;
+    };
+    .btns{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 40px;
+      
+
     }
 `
